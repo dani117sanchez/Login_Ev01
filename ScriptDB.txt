@@ -1,0 +1,48 @@
+-----Crear base de datos 
+CREATE DATABASE DB_ACCESO
+GO
+-----Usar la base de datos
+USE DB_ACCESO
+GO
+-----Crear tabla usuario
+CREATE TABLE Usuario (
+ IdUsuario INT PRIMARY KEY IDENTITY(1,1),
+ Correo VARCHAR (100),
+ Clave VARCHAR (500)
+)
+GO
+-----Procedimientos almacenados para el control de los usuarios 
+create procedure sp_RegistrarUsuario(  
+ @Correo varchar (100),  
+ @Clave varchar (500),  
+ @Registrado bit output,  
+ @Mensaje varchar (100) output  
+)  
+ as  
+  begin  
+    if(not exists(select * from Usuario where Correo = @Correo))  
+  begin  
+insert into Usuario(Correo,Clave) values(@Correo,@Clave)  
+   set @Registrado = 1  
+   set @Mensaje = 'usuario registrado'  
+ end  
+   else  
+  begin  
+   set @Registrado = 0  
+   set @Mensaje = 'correo ya existe'  
+  end  
+end
+GO
+------------------
+create proc sp_ValidarUsuario(  
+ @Correo varchar (100),  
+ @Clave varchar (500)  
+)  
+as  
+begin  
+  if(exists(select * from Usuario where Correo = @Correo and Clave = @Clave))  
+     select IdUsuario from Usuario where Correo = @Correo and Clave = @Clave  
+  else   
+     select '0'  
+end
+GO
